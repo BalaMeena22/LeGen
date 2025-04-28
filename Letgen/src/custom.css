@@ -1,0 +1,90 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.hero.is-fullheight {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.hero-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+}
+.container {
+  width: 100%;
+  max-width: 1200px;
+}
+/* Gmail-like inbox table */
+.gmail-table {
+  border: 1px solid #e0e0e0;
+  background-color: #fff;
+}
+
+.gmail-table th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.gmail-table tr {
+  transition: background-color 0.2s;
+}
+
+.gmail-table tr:hover {
+  background-color: #f1f3f4;
+  cursor: pointer;
+}
+
+.gmail-table td {
+  vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+  color: #202124;
+}
+
+.gmail-table td:nth-child(1) {
+  width: 25%;
+  font-weight: 500;
+}
+
+.gmail-table td:nth-child(2) {
+  width: 35%;
+}
+
+.gmail-table td:nth-child(3) {
+  width: 30%;
+  color: #5f6368;
+}
+
+.gmail-table td:nth-child(4) {
+  width: 10%;
+  text-align: right;
+}
+
+/* Email modal */
+.email-body {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  max-width: 800px;
+  width: 90%;
+}
+
+.modal-close {
+  background-color: #1a73e8;
+}
+
+.modal-close:hover {
+  background-color: #1557b0;
+}
