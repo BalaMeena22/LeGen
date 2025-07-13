@@ -16,7 +16,7 @@ function Login() {
     setLoginError('');
 
     try {
-      const response = await axios.post('http://localhost:3008/login', { collegeMailId: email, password });
+      const response = await axios.post('https://legen-cx5g.onrender.com/login', { collegeMailId: email, password });
       console.log('Login successful:', response.data);
       localStorage.setItem('userCollegeId', email); 
       navigate('/dashboard');

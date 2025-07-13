@@ -126,7 +126,7 @@ const Dashboard = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`http://localhost:3008/users/email/${collegeMailId}`);
+      const response = await axios.get(`https://legen-cx5g.onrender.com/users/email/${collegeMailId}`);
       setProfileDetails(response.data);
       setTempProfileDetails({ ...response.data });
       setEmailForm((prev) => ({ ...prev, from: response.data.collegeMailId }));
@@ -145,7 +145,7 @@ const Dashboard = () => {
 
   const fetchRecipients = async () => {
     try {
-      const response = await axios.get('http://localhost:3008/users', {
+      const response = await axios.get('https://legen-cx5g.onrender.com/users', {
         params: { excludeRole: profileDetails?.professionRole.includes('student') ? 'student' : '' },
       });
       setRecipients(response.data);
@@ -162,7 +162,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:3008/letters/${userId}`);
+      const response = await axios.get(`https://legen-cx5g.onrender.com/letters/${userId}`);
       setLetterHistory(response.data);
       console.log('Fetched Letter History:', response.data);
     } catch (error) {
@@ -180,7 +180,7 @@ const Dashboard = () => {
     }
     setEmailLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3008/emails/${userId}`);
+      const response = await axios.get(`https://legen-cx5g.onrender.com/emails/${userId}`);
       setEmails(response.data);
       if (response.data.length > 0) {
         toast.success('Emails fetched!');
@@ -233,7 +233,7 @@ const Dashboard = () => {
         toast.error('User ID not found.');
         return;
       }
-      const response = await axios.put(`http://localhost:3008/users/${userId}`, tempProfileDetails);
+      const response = await axios.put(`https://legen-cx5g.onrender.com/users/${userId}`, tempProfileDetails);
       setProfileDetails(response.data);
       setTempProfileDetails(response.data);
       setEmailForm((prev) => ({ ...prev, from: response.data.collegeMailId }));
@@ -327,7 +327,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3008/send-email', formData, {
+      const response = await axios.post('https://legen-cx5g.onrender.com/send-email', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success('Email saved successfully!');
@@ -611,7 +611,7 @@ const Dashboard = () => {
       const userId = localStorage.getItem('userId');
       try {
         console.log('Saving letter to backend:', { userId, name: filename, formData: data });
-        const response = await axios.post('http://localhost:3008/letters', {
+        const response = await axios.post('https://legen-cx5g.onrender.com/letters', {
           userId,
           name: filename,
           createdAt: new Date().toISOString(),
@@ -630,7 +630,7 @@ const Dashboard = () => {
       const userId = localStorage.getItem('userId');
       try {
         console.log('Saving edited letter to backend:', { userId, name: filename, formData: data });
-        const response = await axios.post('http://localhost:3008/letters', {
+        const response = await axios.post('https://legen-cx5g.onrender.com/letters', {
           userId,
           name: filename,
           createdAt: new Date().toISOString(),
@@ -674,7 +674,7 @@ const Dashboard = () => {
 
   const handleDownloadLetter = async (letterId) => {
     try {
-      const response = await axios.get(`http://localhost:3008/letters/download/${letterId}`);
+      const response = await axios.get(`https://legen-cx5g.onrender.com/letters/download/${letterId}`);
       const letter = response.data;
       if (letter.formData.editedContent) {
         generatePDF(

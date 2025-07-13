@@ -180,7 +180,7 @@ function Signup() {
     };
 
     try {
-      const response = await axios.post('http://localhost:3008/register', userData);
+      const response = await axios.post('https://legen-cx5g.onrender.com/register', userData);
       console.log('Manual registration response:', response.data);
       setRegistrationSuccess(true);
     } catch (error) {
@@ -194,7 +194,7 @@ function Signup() {
     setRegistrationSuccess(false);
 
     try {
-      const response = await axios.post('http://localhost:3008/register/google', {
+      const response = await axios.post('https://legen-cx5g.onrender.com/google', {
         token: googleData.credential,
       });
       console.log('Google registration response:', response.data);
