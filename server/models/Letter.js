@@ -1,12 +1,15 @@
-const mongoose = require('mongoose');
-
+const mongoose = require('mongoose'); // Add this at the top
 const letterSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'register', required: true },
-  name: String,
-  createdAt: String,
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Register', 
+    required: true 
+  },
+  name: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
   formData: {
-    recipientId: { type: mongoose.Schema.Types.ObjectId, ref: 'register' },
-    letterType: String,
+    recipientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Register' },
+    letterType: { type: String, required: true },
     startDate: String,
     endDate: String,
     reason: String,
@@ -22,11 +25,13 @@ const letterSchema = new mongoose.Schema({
   signatureData: {
     image: String,
     signedBy: String,
-    signedById: { type: mongoose.Schema.Types.ObjectId, ref: 'register' },
-    signedAt: String,
-  },
+    signedById: { type: mongoose.Schema.Types.ObjectId, ref: 'Register' },
+    signedAt: Date,
+  }
 });
 
-const letterModel = mongoose.model('letter', letterSchema);
+// Add indexes for faster queries
+letterSchema.index({ userId: 1 });
+letterSchema.index({ 'formData.recipientId': 1 });
 
-module.exports = letterModel;
+const Letter = mongoose.model('Letter', letterSchema);

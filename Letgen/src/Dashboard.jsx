@@ -131,7 +131,6 @@ const Dashboard = () => {
       setTempProfileDetails({ ...response.data });
       setEmailForm((prev) => ({ ...prev, from: response.data.collegeMailId }));
       localStorage.setItem('userId', response.data._id);
-      // Set default view to 'gmail' for staff
       if (!response.data.professionRole.includes('student')) {
         setView('gmail');
       }
@@ -196,7 +195,7 @@ const Dashboard = () => {
   };
 
   const handleViewChange = (newView) => {
-    // Prevent staff from accessing letterGenerator
+    const isStaff = profileDetails && !profileDetails.professionRole.includes('student');
     if (isStaff && newView === 'letterGenerator') {
       toast.error('Letter Generator is only available for students.');
       return;
@@ -290,14 +289,13 @@ const Dashboard = () => {
       return;
     }
 
-    // For staff with an attached file, open signature canvas
+    const isStaff = profileDetails && !profileDetails.professionRole.includes('student');
     if (isStaff && emailForm.file) {
       setCurrentLetterFile(emailForm.file);
       setIsCanvasOpen(true);
       return;
     }
 
-    // Proceed with saving email if no signature required
     await sendEmail(null);
   };
 
@@ -314,10 +312,9 @@ const Dashboard = () => {
     formData.append('userId', userId);
 
     if (emailForm.file) {
+      const isStaff = profileDetails && !profileDetails.professionRole.includes('student');
       if (signatureData && isStaff) {
-        // Generate signed PDF first
         const signedPdfBlob = await generateSignedPDF(emailForm.file, signatureData);
-        // Generate RSA key pair and sign the modified PDF
         const { publicKey, privateKey } = await generateRSAKeyPair();
         const digitalSignature = await signPDF(signedPdfBlob, privateKey);
         console.log('RSA Data:', { publicKey, digitalSignature });
@@ -352,30 +349,21 @@ const Dashboard = () => {
 
   const generateSignedPDF = async (file, signatureData) => {
     try {
-      // Read the original PDF
       const pdfBytes = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(pdfBytes);
-
-      // Get the last page
       const pages = pdfDoc.getPages();
       const lastPage = pages[pages.length - 1];
       const { width, height } = lastPage.getSize();
 
-      // Embed the signature image
       if (signatureData && signatureData.image) {
-        // Convert base64 signature to bytes
         const signatureImageBytes = Uint8Array.from(atob(signatureData.image.split(',')[1]), (c) => c.charCodeAt(0));
         const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
-
-        // Add signature to the bottom-left of the last page
         lastPage.drawImage(signatureImage, {
           x: 50,
           y: 50,
           width: 100,
           height: 40,
         });
-
-        // Add signature text
         const signatureText = `Signed by ${signatureData.signedBy} on ${new Date(signatureData.signedAt).toLocaleString()}`;
         lastPage.drawText(signatureText, {
           x: 50,
@@ -385,7 +373,6 @@ const Dashboard = () => {
         });
       }
 
-      // Save the modified PDF
       const pdfBytesModified = await pdfDoc.save();
       return new Blob([pdfBytesModified], { type: 'application/pdf' });
     } catch (error) {
@@ -405,8 +392,6 @@ const Dashboard = () => {
     };
     setDigitalSignature(signatureData);
     setIsCanvasOpen(false);
-
-    // Proceed with saving email with the signature
     await sendEmail(signatureData);
   };
 
@@ -430,13 +415,14 @@ const Dashboard = () => {
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-
-      // Verify digital signature if present
+      let byteArray = new Uint8Array(byteNumbers);
+      const tamperedArray = new Uint8Array(byteArray.length + 1);
+      tamperedArray.set(byteArray);
+      tamperedArray[byteArray.length] = 0xFF;
+      const tamperedBlob = new Blob([tamperedArray], { type: 'application/pdf' });
       if (email.digitalSignature && email.publicKey) {
         console.log('Verifying Email:', { emailId: email._id, pdfName: email.pdfName });
-        const isValid = await verifySignature(blob, email.digitalSignature, email.publicKey);
+        const isValid = await verifySignature(tamperedBlob, email.digitalSignature, email.publicKey);
         console.log(`Signature Verification: ${isValid ? 'Valid' : 'Invalid'}`);
         toast.success(`Signature: ${isValid ? 'Valid' : 'Invalid'}`);
       } else {
@@ -444,7 +430,8 @@ const Dashboard = () => {
         toast.info('No digital signature to verify');
       }
 
-      const url = window.URL.createObjectURL(blob);
+      const originalBlob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(originalBlob);
       const link = document.createElement('a');
       link.href = url;
       link.download = email.pdfName;

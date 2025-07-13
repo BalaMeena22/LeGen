@@ -1,18 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // Add this at the top
 
 const registerSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
-  collegeMailId: String,
-  professionRole: [String], // Array to allow multiple roles
-  deptAndSection: String, // For staff advisor (includes year)
-  department: String, // For HOD, staff advisor, and student
-  isHosteller: String, // 'yes' or 'no' for students
-  hostelName: String, // For hosteller students and sub warden
-  rollNumber: String // Only for student
-});
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  collegeMailId: { type: String, required: true, unique: true },
+  professionRole: { type: [String], required: true },
+  deptAndSection: String,
+  department: String,
+  isHosteller: String,
+  hostelName: String,
+  rollNumber: String
+}, { timestamps: true });
 
-const registerModel = mongoose.model("register", registerSchema);
+registerSchema.index({ collegeMailId: 1 }, { unique: true });
+registerSchema.index({ email: 1 }, { unique: true });
 
-module.exports = registerModel;
+module.exports = mongoose.model("Register", registerSchema);

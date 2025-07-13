@@ -5,6 +5,7 @@ const multer = require('multer');
 const registerModel = require('./models/LetterGen');
 const letterModel = require('./models/Letter');
 const emailModel = require('./models/Email');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
@@ -24,12 +25,19 @@ const upload = multer({
 });
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/LetterGen')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+const atlasUri = process.env.MONGODB_URI;
+
+mongoose.connect(atlasUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  retryWrites: true,
+  w: 'majority'
+})
+.then(() => console.log('Connected to MongoDB Atlas'))
+.catch((err) => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1);
+});
 
 // Manual registration
 app.post('/register', async (req, res) => {
